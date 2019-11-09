@@ -1,7 +1,7 @@
 // const START_DISPLAY = "Hello, \
 //               I'm Listenning!!!";
 const START_DISPLAY = "Hello!!!";
-
+radio.setGroup(1)
 OLED.init(128, 95);
 
 /**
@@ -52,5 +52,5 @@ basic.forever(function () {
     input.onButtonPressed(Button.AB, function () {
         basic.showString(START_DISPLAY);
     })
-    
+
 })
