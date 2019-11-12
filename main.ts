@@ -25,10 +25,13 @@ function screenDisplay(default_display = START_DISPLAY, current_display: string)
     }
 }
 
-function sendRadioSignal(signal: boolean): void {
-    if (signal) {
+function sendRadioSignal(signal: boolean): boolean {
+    let ret = false;
+    if (signal == true) {
         radio.sendString("Help on the way!!");
+        ret = true;
     }
+    return ret;
 }
 
 function recieveRadioSignal(): boolean {
@@ -36,7 +39,7 @@ function recieveRadioSignal(): boolean {
     radio.onReceivedString(function (receivedString: string) {
         ret = true;
         //screenDisplay(receivedString);
-        basic.showString("Help!");
+        basic.showString(receivedString);
 
     })
     return ret;
@@ -45,9 +48,17 @@ function recieveRadioSignal(): boolean {
 basic.forever(function () {
     let radio_signal = recieveRadioSignal()
     basic.showString(START_DISPLAY);
-    input.onButtonPressed(Button.A, function () {
-        sendRadioSignal(radio_signal);
+    input.onButtonPressed(Button.B, function () {
+        let message_sent = sendRadioSignal(true);
+        if (message_sent = true) {
+            basic.showString("Notifying!")
+        }
+        else {
+            basic.showString("Failed!")
+        }
     })
+
+
 
     input.onButtonPressed(Button.AB, function () {
         basic.showString(START_DISPLAY);
