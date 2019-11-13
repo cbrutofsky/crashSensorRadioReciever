@@ -1,8 +1,16 @@
-// const START_DISPLAY = "Hello, \
-//               I'm Listenning!!!";
-const START_DISPLAY = "Hello!!!";
+const START_DISPLAY = "Hello, \
+              I'm Listenning!!!";
 radio.setGroup(1)
 OLED.init(128, 95);
+screenDisplay(null, START_DISPLAY);
+let red = DigitalPin.P1;
+let green = DigitalPin.P8;
+let blue = DigitalPin.P16;
+let off = OnOff.Off;
+let on = OnOff.On;
+tinkercademy.LED(red, off);
+tinkercademy.LED(green, on);
+tinkercademy.LED(blue, off);
 
 /**
  * Function that controls the message that the OLED is displaying.
@@ -26,42 +34,41 @@ function screenDisplay(default_display = START_DISPLAY, current_display: string)
 }
 
 function sendRadioSignal(signal: boolean): boolean {
-    let ret = false;
-    if (signal == true) {
-        radio.sendString("Help on the way!!");
-        ret = true;
-    }
-    return ret;
+    radio.sendString("Help on the way!!");
+    screenDisplay("", "Notifying!");
+    return true;
 }
 
-function recieveRadioSignal(): boolean {
-    let ret = false;
+function onRecieveRadioSignal(recievedString: string): boolean {
+    tinkercademy.LED(red, on);
+    tinkercademy.LED(green, off);
+    screenDisplay("", recievedString);
+    return true;
+}
+
+basic.forever(() => {
+    let recieved_radio_signal = false;
+    let message_sent = false;
     radio.onReceivedString(function (receivedString: string) {
-        ret = true;
-        //screenDisplay(receivedString);
-        basic.showString(receivedString);
-
+        if (receivedString != null) {
+            recieved_radio_signal = onRecieveRadioSignal(receivedString);
+        }
     })
-    return ret;
-}
 
-basic.forever(function () {
-    let radio_signal = recieveRadioSignal()
-    basic.showString(START_DISPLAY);
     input.onButtonPressed(Button.B, function () {
-        let message_sent = sendRadioSignal(true);
-        if (message_sent = true) {
-            basic.showString("Notifying!")
-        }
-        else {
-            basic.showString("Failed!")
+        message_sent = sendRadioSignal(recieved_radio_signal);
+        if (message_sent == true) {
+            tinkercademy.LED(blue, on);
+            tinkercademy.LED(red, off);
+            tinkercademy.LED(green, off);
         }
     })
-
-
 
     input.onButtonPressed(Button.AB, function () {
-        basic.showString(START_DISPLAY);
+        screenDisplay(null, START_DISPLAY);
+        tinkercademy.LED(red, off);
+        tinkercademy.LED(blue, off);
+        tinkercademy.LED(green, on);
     })
-
 })
+
